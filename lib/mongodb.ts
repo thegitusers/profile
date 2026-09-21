@@ -4,13 +4,9 @@ import { MongoClient, type Db } from "mongodb";
 // This network's local DNS resolver intermittently fails to resolve
 // mongodb.net hostnames (both SRV and plain A record lookups). Route DNS
 // through public resolvers instead so lookups don't randomly fail.
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+dns.setServers(["8.8.8.8", "1.1.8.8"]);
 
 const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-  throw new Error("Missing MONGODB_URI environment variable");
-}
 
 declare global {
   // eslint-disable-next-line no-var
@@ -40,6 +36,10 @@ async function ensureIndexes(db: Db) {
 }
 
 export async function getDb(): Promise<Db> {
+  if (!uri) {
+    throw new Error("Missing MONGODB_URI environment variable");
+  }
+
   // Reuse one pooled connection for the life of the server process instead
   // of opening a fresh one on every request.
   if (!global._mongoClientPromise) {
